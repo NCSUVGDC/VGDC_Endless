@@ -88,6 +88,9 @@ void AVRPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Oculus / Vive handle their camera location relative to the ground;
+	// PS VR handles it from eye level
+	UHeadMountedDisplayFunctionLibrary::SetTrackingOrigin(EHMDTrackingOrigin::Floor);
 }
 
 // Called every frame
