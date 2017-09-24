@@ -112,14 +112,11 @@ void AVRPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AVRPawn::RightTrigger(float Val)
 {
-	UE_LOG(LogTemp, Log, TEXT("%f"), Val);
-
 	if (Val > 0.01f)
 	{
 		DrawDebugLine(GetWorld(), RightController->GetComponentLocation(),
 			RightController->GetComponentLocation() + RightController->GetForwardVector() * TriggerBeamLength,
 			FColor(0, 255 * Val, 0), false, -1.0f, 0, 2.5f);
-		
 	}
 }
 
