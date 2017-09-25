@@ -5,6 +5,7 @@
 #include "Runtime/Engine/Classes/Components/StaticMeshComponent.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Runtime/Engine/Classes/Components/InputComponent.h"
+#include "Runtime/Engine/Classes/Engine/World.h"
 #include "DrawDebugHelpers.h"
 
 
@@ -114,9 +115,7 @@ void AVRPawn::RightTrigger(float Val)
 {
 	if (Val > 0.01f)
 	{
-		DrawDebugLine(GetWorld(), RightController->GetComponentLocation(),
-			RightController->GetComponentLocation() + RightController->GetForwardVector() * TriggerBeamLength,
-			FColor(0, 255 * Val, 0), false, -1.0f, 0, 2.5f);
+		WeaponTracing(RightController, Val);
 	}
 }
 
@@ -124,8 +123,51 @@ void AVRPawn::LeftTrigger(float Val)
 {
 	if (Val > 0.01f)
 	{
-		DrawDebugLine(GetWorld(), LeftController->GetComponentLocation(),
-			LeftController->GetComponentLocation() + LeftController->GetForwardVector() * TriggerBeamLength,
-			FColor(0, 0, 255 * Val), false, -1.0f, 0, 2.5f);
+		WeaponTracing(LeftController, Val);
+	}
+}
+
+void AVRPawn::WeaponTracing(UMotionControllerComponent* Controller, 
+	float Sensitivity)
+{
+	// Make sure firing sensitivity is valid
+	Sensitivity = FMath::Clamp(Sensitivity, 0.0f, 1.0f);
+
+	UE_LOG(LogTemp, Log, TEXT("Firing from %s | Sensitivity: %f"), 
+		*Controller->GetName(), Sensitivity);
+
+	// Trace parameters
+	FVector TraceStart = Controller->GetComponentLocation() + (Controller->GetForwardVector() * TracingOffset);
+	FVector TraceEnd   = Controller->GetComponentLocation() + (Controller->GetForwardVector() * WeaponRange);
+	FHitResult Hit;
+
+	// Actual ray tracing call
+	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, 
+		ECollisionChannel::ECC_Visibility);
+
+	if(DebugDrawWeaponRays)
+		DrawDebugLine(GetWorld(), TraceStart, TraceEnd,	FColor(0, 0, 255 * Sensitivity), false, -1.0f, 0, 1.0f);
+
+	if (Hit.bBlockingHit)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Blocking hit!"));
+		UE_LOG(LogTemp, Log, TEXT("Hit Component: %s | Hit location: %s"), 
+			*Hit.GetComponent()->GetName(), *Hit.Location.ToString());
+
+		if (DebugDrawWeaponHits)
+			DrawDebugSphere(GetWorld(), Hit.Location, 8.0f, 4, FColor(255, 0, 0));
+
+		/**  Here we could find out if the actor we hit is of our door crystal subclass:
+		
+		ATargetClass* HitActorAsTarget = Cast<ATargetClass>(Hit.GetActor());
+
+		if(HitActorAsTarget != nullptr)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Hit a door's crystal!"));
+			HitActorAsTarget->TakeDamage(Sensitivity);
+			...
+		}
+
+		*/
 	}
 }
