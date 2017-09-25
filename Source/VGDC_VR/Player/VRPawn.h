@@ -19,15 +19,30 @@ class VGDC_VR_API AVRPawn : public APawn
 {
 	GENERATED_BODY()
 
-public:
-	// Sets default values for this pawn's properties
-	AVRPawn();
+private:
+	/**
+	 * Helper function that handles the tracing and damage of a weapon when
+	 *   fired from a controller.
+	 * Has an optional parameter for how hard the trigger was pulled down. If
+	 *   sensitivity is not given, it defaults to 1.0
+	 *
+	 * @param Controller - Controller to fire from (Left or Right)
+	 * @param Sensitivity - How hard the trigger was pulled [0..1]
+	 */
+	void WeaponTracing(UMotionControllerComponent* Controller, float Sensitivity = 1.0f);
+
+	// How far from the controller we start tracing
+	// Helps prevent us from hitting the controller
+	float TracingOffset = 5.0f;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
+	// Sets default values for this pawn's properties
+	AVRPawn();
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -69,7 +84,18 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 		UMotionControllerComponent* RightController;
 
-	// How far out the beam should fly out from the controller
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Controllers")
-		float TriggerBeamLength = 6000.0f;
+	// How far we'll track the player's fire
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon",
+		META = (UIMin = 100.0f, UIMax = 10000000.0f))
+		float WeaponRange = 6000.0f;
+
+	// If true, we'll draw lines from the player's controllers when firing
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Debug",
+		META = (DisplayName = "Draw Weapon Rays"))
+		bool DebugDrawWeaponRays = true;
+
+	// If true, we'll draw spheres where the player's weapons hit
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Debug",
+		META = (DisplayName = "Draw Weapon Hits"))
+		bool DebugDrawWeaponHits = true;
 };
