@@ -55,12 +55,10 @@ AVRPawn::AVRPawn()
 	LeftControllerInteractor = CreateAbstractDefaultSubobject<UWidgetInteractionComponent>(TEXT("Left UI Interactor"));
 	LeftControllerInteractor->SetupAttachment(LeftController);
 	LeftControllerInteractor->SetRelativeLocation(FVector(0.0f));
-	LeftControllerInteractor->bEnableHitTesting = false; // Only enable hit testing when game paused. May help performance.
 
 	RightControllerInteractor = CreateAbstractDefaultSubobject<UWidgetInteractionComponent>(TEXT("Right UI Interactor"));
 	RightControllerInteractor->SetupAttachment(RightController);
 	RightControllerInteractor->SetRelativeLocation(FVector(0.0f));
-	RightControllerInteractor->bEnableHitTesting = false; // Only enable hit testing when game paused. May help performance.
 
 	
 
