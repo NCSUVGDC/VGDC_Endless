@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "VRPawn.h"
-#include "Runtime/Engine/Classes/Kismet/HeadMountedDisplayFunctionLibrary.h"
+#include "HeadMountedDisplayFunctionLibrary.h"
 #include "Runtime/Engine/Classes/Components/StaticMeshComponent.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Runtime/Engine/Classes/Components/InputComponent.h"
@@ -50,7 +50,20 @@ AVRPawn::AVRPawn()
 	RightController->Hand = EControllerHand::Right;
 
 
+
+	/// Interactors setup
+	LeftControllerInteractor = CreateAbstractDefaultSubobject<UWidgetInteractionComponent>(TEXT("Left UI Interactor"));
+	LeftControllerInteractor->SetupAttachment(LeftController);
+	LeftControllerInteractor->SetRelativeLocation(FVector(0.0f));
+	LeftControllerInteractor->bEnableHitTesting = false; // Only enable hit testing when game paused. May help performance.
+
+	RightControllerInteractor = CreateAbstractDefaultSubobject<UWidgetInteractionComponent>(TEXT("Right UI Interactor"));
+	RightControllerInteractor->SetupAttachment(RightController);
+	RightControllerInteractor->SetRelativeLocation(FVector(0.0f));
+	RightControllerInteractor->bEnableHitTesting = false; // Only enable hit testing when game paused. May help performance.
+
 	
+
 	/// Meshes setup
 	// Get the in-engine HMD mesh
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> HeadsetMesh(TEXT("StaticMesh'/Engine/VREditor/Devices/Generic/GenericHMD.GenericHMD'"));
@@ -81,6 +94,8 @@ AVRPawn::AVRPawn()
 	RightControllerMeshComp->SetupAttachment(RightController);
 	RightControllerMeshComp->SetRelativeLocation(FVector(0.0f));
 	RightControllerMeshComp->SetStaticMesh(ControllerMesh.Object);
+
+	
 
 }
 
