@@ -6,6 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "Runtime/Engine/Classes/Camera/CameraComponent.h"
 #include "Runtime/HeadMountedDisplay/Public/MotionControllerComponent.h"
+#include "Runtime/UMG/Public/Components/WidgetInteractionComponent.h"
 #include "VRPawn.generated.h"
 
 /**
@@ -75,14 +76,22 @@ public:
 		UCameraComponent* Camera;
 
 	// Motion controller for the left hand
-	// Can't get UMotionControllerComponent to work with UPROPERTY. Looking into it.
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 		UMotionControllerComponent* LeftController;
 
+	// Component needed to allow the VR controllers to interact with 
+	//   UMG widgets
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+		UWidgetInteractionComponent* LeftControllerInteractor;
+
 	// Motion controller for the right hand
-	// Can't get UMotionControllerComponent to work with UPROPERTY. Looking into it.
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 		UMotionControllerComponent* RightController;
+
+	// Component needed to allow the VR controllers to interact with 
+	//   UMG widgets
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+		UWidgetInteractionComponent* RightControllerInteractor;
 
 	// How far we'll track the player's fire
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon",

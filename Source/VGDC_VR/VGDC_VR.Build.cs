@@ -11,7 +11,7 @@ public class VGDC_VR : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
 
         // Needed for the headset and controllers
-        PrivateDependencyModuleNames.AddRange(new string[] { "HeadMountedDisplay", "SteamVR" });
+        PrivateDependencyModuleNames.AddRange(new string[] { "HeadMountedDisplay", "SteamVR", "UMG" });
 
         // Uncomment if you are using Slate UI
         // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
