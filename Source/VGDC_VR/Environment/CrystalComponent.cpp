@@ -24,10 +24,15 @@ void UCrystalComponent::BeginPlay()
 
 	// Transform must be updated after being generated because of a UE4 bug
 	// TODO: Report this bug!
-	CrystalMesh->SetRelativeLocation(FVector(0.0001f));
-	CrystalMesh->RegisterComponentWithWorld(GetWorld());
+	ResetMeshTransform();
 }
 
+void UCrystalComponent::ResetMeshTransform()
+{
+	CrystalMesh->SetRelativeLocation(FVector(0.0001f));
+	CrystalMesh->SetRelativeRotation(FRotator(0.0001f));
+	//CrystalMesh->SetRelativeScale3D(FVector(1.0001f));
+}
 
 // Called every frame
 void UCrystalComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

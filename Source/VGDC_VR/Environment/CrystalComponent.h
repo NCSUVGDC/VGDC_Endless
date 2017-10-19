@@ -38,4 +38,12 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Crystal")
 		UStaticMeshComponent* CrystalMesh;
+
+	/**
+	 * A UE4 bug causes meshes attached to components to never be in the right 
+	 *   spot. This function fixes that, and must be called every time the 
+	 *   crystal is moved! 
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Crystal")
+		void ResetMeshTransform();
 };
