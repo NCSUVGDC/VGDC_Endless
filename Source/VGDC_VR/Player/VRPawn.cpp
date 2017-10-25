@@ -6,6 +6,7 @@
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Runtime/Engine/Classes/Components/InputComponent.h"
 #include "Runtime/Engine/Classes/Engine/World.h"
+#include "../Environment/ShootableInterface.h"
 #include "DrawDebugHelpers.h"
 
 
@@ -169,6 +170,15 @@ void AVRPawn::WeaponTracing(UMotionControllerComponent* Controller,
 
 		if (DebugDrawWeaponHits)
 			DrawDebugSphere(GetWorld(), Hit.Location, 8.0f, 4, FColor(255, 0, 0));
+
+		if (Hit.GetActor()->GetClass()->ImplementsInterface(UShootableInterface::StaticClass()))
+		{
+			UE_LOG(LogTemp, Log, TEXT("Hit a door's crystal!"));
+
+			// How to call the interface function, as per Discord
+			// Docs say otherwise, but the docs say to do it in a way that doesn't compile
+			IShootableInterface::Execute_OnShot(Hit.GetActor());
+		}
 
 		/**  Here we could find out if the actor we hit is of our door crystal subclass:
 		
