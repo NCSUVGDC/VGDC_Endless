@@ -36,6 +36,12 @@ private:
 	// Helps prevent us from hitting the controller
 	float TracingOffset = 5.0f;
 
+	// Set to true when the player pulls the trigger past the threshold,
+	//   set to false when the player releases the trigger past the threshold
+	// This way the player only fires once per trigger pull
+	bool isHoldingRightTrigger = false;
+	bool isHoldingLeftTrigger = false;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -92,6 +98,13 @@ public:
 	//   UMG widgets
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 		UWidgetInteractionComponent* RightControllerInteractor;
+
+	// How far the player has to pull on the trigger to fire
+	// Once this threshold is crossed, the weapon fires once
+	// When the trigger is loosened below this value, the gun can be fired again
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon",
+		META = (ClampMin = 0.0001f, ClampMax = 1.0f))
+		float WeaponSensitivity = 0.25f;
 
 	// How far we'll track the player's fire
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon",
