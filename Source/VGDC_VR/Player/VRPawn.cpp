@@ -173,11 +173,15 @@ void AVRPawn::WeaponTracing(UMotionControllerComponent* Controller,
 
 		if (Hit.GetActor()->GetClass()->ImplementsInterface(UShootableInterface::StaticClass()))
 		{
-			UE_LOG(LogTemp, Log, TEXT("Hit a door's crystal!"));
+			UE_LOG(LogTemp, Log, TEXT("Hit a shootable actor!"));
 
 			// How to call the interface function, as per Discord
 			// Docs say otherwise, but the docs say to do it in a way that doesn't compile
 			IShootableInterface::Execute_OnShot(Hit.GetActor());
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("Actor \"%s\" is not shootable!"), *Hit.GetActor()->GetName());
 		}
 
 		/**  Here we could find out if the actor we hit is of our door crystal subclass:
