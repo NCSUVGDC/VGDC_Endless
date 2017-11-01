@@ -74,29 +74,37 @@ public:
 
 	// Acts as a root component for the camera and controllers
 	// May not actually be necessary, but the VR template recommended it
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
 		USceneComponent* VROrigin;
 
 	// Player's camera
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
 		UCameraComponent* Camera;
 
 	// Motion controller for the left hand
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components|Left Hand")
 		UMotionControllerComponent* LeftController;
+
+	// Mesh for player's the left hand
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components|Left Hand")
+		UStaticMeshComponent* LeftControllerMesh;
 
 	// Component needed to allow the VR controllers to interact with 
 	//   UMG widgets
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components|Left Hand")
 		UWidgetInteractionComponent* LeftControllerInteractor;
 
 	// Motion controller for the right hand
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components|Right Hand")
 		UMotionControllerComponent* RightController;
+
+	// Mesh for player's the right hand
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components|Right Hand")
+		UStaticMeshComponent* RightControllerMesh;
 
 	// Component needed to allow the VR controllers to interact with 
 	//   UMG widgets
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components|Right Hand")
 		UWidgetInteractionComponent* RightControllerInteractor;
 
 	// How far the player has to pull on the trigger to fire

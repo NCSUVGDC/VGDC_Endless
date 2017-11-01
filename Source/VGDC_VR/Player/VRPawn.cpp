@@ -82,17 +82,17 @@ AVRPawn::AVRPawn()
 	HeadsetMeshComp->bOwnerNoSee = true; // Do not render the headset for the player
 
 	// Initialize left controller mesh
-	UStaticMeshComponent* LeftControllerMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Left Controller Mesh"));
-	LeftControllerMeshComp->SetupAttachment(LeftController);
-	LeftControllerMeshComp->SetRelativeLocation(FVector(0.0f));
-	LeftControllerMeshComp->SetStaticMesh(ControllerMesh.Object);
+	LeftControllerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Left Controller Mesh"));
+	LeftControllerMesh->SetupAttachment(LeftController);
+	LeftControllerMesh->SetRelativeLocation(FVector(0.0f));
+	LeftControllerMesh->SetStaticMesh(ControllerMesh.Object);
 
 	// Initialize right controller mesh
-	UStaticMeshComponent* RightControllerMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Right Controller Mesh"));
-	RightControllerMeshComp->SetRelativeScale3D(FVector(1.0f, -1.0f, 1.0f)); // So that we don't have two left hands
-	RightControllerMeshComp->SetupAttachment(RightController);
-	RightControllerMeshComp->SetRelativeLocation(FVector(0.0f));
-	RightControllerMeshComp->SetStaticMesh(ControllerMesh.Object);
+	RightControllerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Right Controller Mesh"));
+	RightControllerMesh->SetRelativeScale3D(FVector(1.0f, -1.0f, 1.0f)); // So that we don't have two left hands
+	RightControllerMesh->SetupAttachment(RightController);
+	RightControllerMesh->SetRelativeLocation(FVector(0.0f));
+	RightControllerMesh->SetStaticMesh(ControllerMesh.Object);
 
 	
 
