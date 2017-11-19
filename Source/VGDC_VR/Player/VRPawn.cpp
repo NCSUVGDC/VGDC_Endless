@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "VRPawn.h"
+#include "PowerCell.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Runtime/Engine/Classes/Components/StaticMeshComponent.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
@@ -112,6 +113,28 @@ void AVRPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!l_readyToFire)
+	{
+		if (l_timePassedSinceLastFire < fireRate)
+			l_timePassedSinceLastFire += DeltaTime;
+		else
+		{
+			l_readyToFire = true;
+			l_timePassedSinceLastFire = 0.0f;
+		}
+	}
+
+	if (!r_readyToFire)
+	{
+		if (r_timePassedSinceLastFire < fireRate)
+			r_timePassedSinceLastFire += DeltaTime;
+		else
+		{
+			r_readyToFire = true;
+			r_timePassedSinceLastFire = 0.0f;
+		}
+	}
+
 }
 
 // Called to bind functionality to input
@@ -128,7 +151,7 @@ void AVRPawn::RightTrigger(float Val)
 {
 	if (Val > 0.01f)
 	{
-		WeaponTracing(RightController, Val);
+		WeaponTracing(RightController, r_readyToFire, Val);
 	}
 }
 
@@ -136,12 +159,12 @@ void AVRPawn::LeftTrigger(float Val)
 {
 	if (Val > 0.01f)
 	{
-		WeaponTracing(LeftController, Val);
+		WeaponTracing(LeftController, l_readyToFire, Val);
 	}
 }
 
 void AVRPawn::WeaponTracing(UMotionControllerComponent* Controller, 
-	float Sensitivity)
+							bool& fireReady, float Sensitivity)
 {
 	// Make sure firing sensitivity is valid
 	Sensitivity = FMath::Clamp(Sensitivity, 0.0f, 1.0f);
@@ -161,6 +184,12 @@ void AVRPawn::WeaponTracing(UMotionControllerComponent* Controller,
 	if(DebugDrawWeaponRays)
 		DrawDebugLine(GetWorld(), TraceStart, TraceEnd,	FColor(0, 0, 255 * Sensitivity), false, -1.0f, 0, 1.0f);
 
+	FVector bulletStart = TraceStart;
+	FVector bulletEnd = TraceEnd;
+	FRotator bulletRot = Controller->GetComponentRotation();
+	
+	FActorSpawnParameters SpawnInfo;
+
 	if (Hit.bBlockingHit)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Blocking hit!"));
@@ -169,7 +198,10 @@ void AVRPawn::WeaponTracing(UMotionControllerComponent* Controller,
 
 		if (DebugDrawWeaponHits)
 			DrawDebugSphere(GetWorld(), Hit.Location, 8.0f, 4, FColor(255, 0, 0));
-
+		
+		// Set the bullet's destination
+		bulletEnd = Hit.Location;
+		
 		/**  Here we could find out if the actor we hit is of our door crystal subclass:
 		
 		ATargetClass* HitActorAsTarget = Cast<ATargetClass>(Hit.GetActor());
@@ -182,5 +214,15 @@ void AVRPawn::WeaponTracing(UMotionControllerComponent* Controller,
 		}
 
 		*/
+
+		
+	}
+	// Fire bullet if ready
+	if (fireReady)
+	{
+		AShootable* bulletInst = GetWorld()->SpawnActor<AShootable>(bullet->GetClass(), bulletStart, bulletRot, SpawnInfo);
+
+		bulletInst->Fire(bulletStart, bulletEnd);
+		fireReady = false;
 	}
 }

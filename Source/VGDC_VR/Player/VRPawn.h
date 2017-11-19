@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-
+#include "Shootable.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Runtime/Engine/Classes/Camera/CameraComponent.h"
@@ -29,12 +29,21 @@ private:
 	 *
 	 * @param Controller - Controller to fire from (Left or Right)
 	 * @param Sensitivity - How hard the trigger was pulled [0..1]
+	 * @param fireReady - is gun ready to fire another bullet?
 	 */
-	void WeaponTracing(UMotionControllerComponent* Controller, float Sensitivity = 1.0f);
+	void WeaponTracing(UMotionControllerComponent* Controller, bool& fireReady, float Sensitivity = 1.0f);
 
 	// How far from the controller we start tracing
 	// Helps prevent us from hitting the controller
 	float TracingOffset = 5.0f;
+
+	// Time passed since gun fire for left and right sides
+	float l_timePassedSinceLastFire = 0, 
+		  r_timePassedSinceLastFire = 0;
+	
+	// boolean check if gun has been fired for left and right guns
+	bool l_readyToFire = true,
+		 r_readyToFire = true;
 
 protected:
 	// Called when the game starts or when spawned
@@ -66,6 +75,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Input")
 		void LeftTrigger(float Val);
 
+	// Bullet Actor to represent shooting
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
+		AShootable* bullet;
+
+	// The rate of fire or how fast bullets spawn
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
+		float fireRate = 0.5f;
+
 	// Acts as a root component for the camera and controllers
 	// May not actually be necessary, but the VR template recommended it
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
@@ -86,7 +103,7 @@ public:
 
 	// Motion controller for the right hand
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-		UMotionControllerComponent* RightController;
+		UMotionControllerComponent* RightController;	
 
 	// Component needed to allow the VR controllers to interact with 
 	//   UMG widgets
