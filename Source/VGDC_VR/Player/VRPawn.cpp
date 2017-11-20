@@ -16,7 +16,7 @@ AVRPawn::AVRPawn()
 	PrimaryActorTick.bCanEverTick = true;
 
 	/// Component Setup
-	// May not be necessary to have a seperate Root component and VROrigin - 
+	// May not be necessary to have a separate Root component and VROrigin - 
 	//   i.e. VROrigin may be good enough as the root
 	// We should investigate this further
 	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
@@ -166,61 +166,64 @@ void AVRPawn::LeftTrigger(float Val)
 void AVRPawn::WeaponTracing(UMotionControllerComponent* Controller, 
 							bool& fireReady, float Sensitivity)
 {
-	// Make sure firing sensitivity is valid
-	Sensitivity = FMath::Clamp(Sensitivity, 0.0f, 1.0f);
-
-	UE_LOG(LogTemp, Log, TEXT("Firing from %s | Sensitivity: %f"), 
-		*Controller->GetName(), Sensitivity);
-
-	// Trace parameters
-	FVector TraceStart = Controller->GetComponentLocation() + (Controller->GetForwardVector() * TracingOffset);
-	FVector TraceEnd   = Controller->GetComponentLocation() + (Controller->GetForwardVector() * WeaponRange);
-	FHitResult Hit;
-
-	// Actual ray tracing call
-	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, 
-		ECollisionChannel::ECC_Visibility);
-
-	if(DebugDrawWeaponRays)
-		DrawDebugLine(GetWorld(), TraceStart, TraceEnd,	FColor(0, 0, 255 * Sensitivity), false, -1.0f, 0, 1.0f);
-
-	FVector bulletStart = TraceStart;
-	FVector bulletEnd = TraceEnd;
-	FRotator bulletRot = Controller->GetComponentRotation();
-	
-	FActorSpawnParameters SpawnInfo;
-
-	if (Hit.bBlockingHit)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Blocking hit!"));
-		UE_LOG(LogTemp, Log, TEXT("Hit Component: %s | Hit location: %s"), 
-			*Hit.GetComponent()->GetName(), *Hit.Location.ToString());
-
-		if (DebugDrawWeaponHits)
-			DrawDebugSphere(GetWorld(), Hit.Location, 8.0f, 4, FColor(255, 0, 0));
-		
-		// Set the bullet's destination
-		bulletEnd = Hit.Location;
-		
-		/**  Here we could find out if the actor we hit is of our door crystal subclass:
-		
-		ATargetClass* HitActorAsTarget = Cast<ATargetClass>(Hit.GetActor());
-
-		if(HitActorAsTarget != nullptr)
-		{
-			UE_LOG(LogTemp, Log, TEXT("Hit a door's crystal!"));
-			HitActorAsTarget->TakeDamage(Sensitivity);
-			...
-		}
-
-		*/
-
-		
-	}
-	// Fire bullet if ready
 	if (fireReady)
 	{
-		AShootable* bulletInst = GetWorld()->SpawnActor<AShootable>(bullet->GetClass(), bulletStart, bulletRot, SpawnInfo);
+		// Make sure firing sensitivity is valid
+		Sensitivity = FMath::Clamp(Sensitivity, 0.0f, 1.0f);
+
+		UE_LOG(LogTemp, Log, TEXT("Firing from %s | Sensitivity: %f"),
+			*Controller->GetName(), Sensitivity);
+
+		// Trace parameters
+		FVector TraceStart = Controller->GetComponentLocation() + (Controller->GetForwardVector() * TracingOffset);
+		FVector TraceEnd = Controller->GetComponentLocation() + (Controller->GetForwardVector() * WeaponRange);
+		FHitResult Hit;
+
+		// Actual ray tracing call
+		GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd,
+			ECollisionChannel::ECC_Visibility);
+
+		if (DebugDrawWeaponRays)
+			DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor(0, 0, 255 * Sensitivity), false, -1.0f, 0, 1.0f);
+
+		FVector bulletStart = Controller->GetComponentLocation();
+		FVector bulletEnd = TraceEnd;
+		FRotator bulletRot = Controller->GetComponentRotation();
+
+		FActorSpawnParameters SpawnInfo;
+
+		if (Hit.bBlockingHit)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Blocking hit!"));
+			UE_LOG(LogTemp, Log, TEXT("Hit Component: %s | Hit location: %s"),
+				*Hit.GetComponent()->GetName(), *Hit.Location.ToString());
+
+			if (DebugDrawWeaponHits)
+				DrawDebugSphere(GetWorld(), Hit.Location, 8.0f, 4, FColor(255, 0, 0));
+
+			// Set the bullet's destination
+			bulletEnd = Hit.Location;
+
+			/**  Here we could find out if the actor we hit is of our door crystal subclass:
+
+			ATargetClass* HitActorAsTarget = Cast<ATargetClass>(Hit.GetActor());
+
+			if(HitActorAsTarget != nullptr)
+			{
+				UE_LOG(LogTemp, Log, TEXT("Hit a door's crystal!"));
+				HitActorAsTarget->TakeDamage(Sensitivity);
+				...
+			}
+
+			*/
+			APowerCell* HitActorAsTarget = Cast<APowerCell>(Hit.GetActor());
+
+			if (HitActorAsTarget != nullptr)
+				HitActorAsTarget->DestroyCell();
+
+		}
+
+		AShootable* bulletInst = GetWorld()->SpawnActor<AShootable>(bullet, bulletStart, bulletRot, SpawnInfo);
 
 		bulletInst->Fire(bulletStart, bulletEnd);
 		fireReady = false;

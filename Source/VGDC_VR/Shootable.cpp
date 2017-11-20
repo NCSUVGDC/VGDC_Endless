@@ -25,7 +25,7 @@ void AShootable::Tick(float DeltaTime)
 	if (targetSet && totalTime <= 1.0f)
 		this->SetActorLocation(LerpedFirePoint(DeltaTime));
 	else if (totalTime > 1.0f)
-		Destroy();
+		DestroyBullet();
 }
 
 void AShootable::Fire(FVector startPoint, FVector endPoint)
@@ -33,6 +33,13 @@ void AShootable::Fire(FVector startPoint, FVector endPoint)
 	source = startPoint;
 	target = endPoint;
 	targetSet = true;
+}
+
+void AShootable::Fire(FVector startPoint, FVector endPoint, APowerCell* pcTarget)
+{
+	Fire(startPoint, endPoint);
+
+	powerCellToDamage = pcTarget;
 }
 
 FVector AShootable::LerpedFirePoint(float delta)
@@ -53,4 +60,16 @@ FVector AShootable::LerpedFirePoint(float delta)
 		
 	return source + (target - source) * totalTime;
 
+}
+
+// Removes all references before destroying bullet
+// TODO: Make functionality to set bullet inactive
+void AShootable::DestroyBullet()
+{
+	// Damages power cell its come in contact with
+	if (powerCellToDamage != nullptr)
+		powerCellToDamage->DamagePowerCell(1);
+	powerCellToDamage = nullptr;
+	targetSet = false;
+	totalTime = 0;
 }

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-
+#include "PowerCell.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Shootable.generated.h"
@@ -24,6 +24,8 @@ private:
 	FVector target;
 	// Total time passed since bullet has been fired
 	float totalTime = 0;
+	// if set power will take damage
+	APowerCell* powerCellToDamage;
 
 protected:
 	// Called when the game starts or when spawned
@@ -40,6 +42,11 @@ public:
 	// Fires bullet towards target from source
 	// TODO: Have this function call particle effects for initial blast
 	void Fire(FVector startPoint, FVector endPoint);
+
+	void Fire(FVector startPoint, FVector endPoint, APowerCell* pcTarget);
+
+	// Handles Garbage Collection on bullet
+	void DestroyBullet();
 
 	// Determines how fast bullet will travel
 	// Equation used: Speed = distance/time

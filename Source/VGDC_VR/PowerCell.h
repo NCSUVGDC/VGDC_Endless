@@ -21,19 +21,29 @@ class VGDC_VR_API APowerCell : public AActor
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Enum)
-	EColorsEnum colorsEnum;
 	// Sets default values for this actor's properties
 	APowerCell();
+	// "Destroys" this power cell
+	void DestroyCell();
+	// Applies damage to the power cell
+	void DamagePowerCell(int hitsOfDamage);
+	// Updates Color of power cell based on its health
+	UFUNCTION(BlueprintCallable, Category = "PowerCell", meta=(Keywords="Change Color of Cell Health"))
+	void UpdateColorOfCell();
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	
+	// Enumeration variable used to change power cell color
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
+		EColorsEnum colorsEnum;
+	// Material instance of the power cell
+	TSubclassOf<UMaterialInstance> material;
+private:
+	int cellHealthPoints = 3;
 	
 };

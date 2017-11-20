@@ -77,7 +77,7 @@ public:
 
 	// Bullet Actor to represent shooting
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
-		AShootable* bullet;
+		TSubclassOf<AShootable> bullet;
 
 	// The rate of fire or how fast bullets spawn
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
