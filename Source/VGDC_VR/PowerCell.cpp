@@ -54,25 +54,25 @@ void APowerCell::DestroyCell()
 
 void APowerCell::UpdateColorOfCell()
 {
-	FName powerCellName = FName(TEXT("PowerCell"));
-	UStaticMeshComponent* powerCellMesh = (UStaticMeshComponent*)GetOwner()->GetDefaultSubobjectByName(powerCellName);
-	
+	//FName powerCellName = FName(TEXT("PowerCell"));
+	//UStaticMeshComponent* powerCellMesh = (UStaticMeshComponent*)GetOwner()->GetDefaultSubobjectByName(powerCellName);
+	//
 
-	colorsEnum = (EColorsEnum)cellHealthPoints;
+	//colorsEnum = (EColorsEnum)cellHealthPoints;
 
-	// Set Material to Red
-	if (colorsEnum == EColorsEnum::VE_RED)
-		material->SetVectorParameterByIndexInternal(0, FColor(1.0f, 0, 0, 1.0f));
+	//// Set Material to Red
+	//if (colorsEnum == EColorsEnum::VE_RED)
+	//	material->SetVectorParameterByIndexInternal(0, FColor(1.0f, 0, 0, 1.0f));
 
-	// Set Material to Blue
-	if (colorsEnum == EColorsEnum::VE_BLUE)
-		material->SetVectorParameterByIndexInternal(0, FColor(0, 0, 1.0f, 1.0f));
+	//// Set Material to Blue
+	//if (colorsEnum == EColorsEnum::VE_BLUE)
+	//	material->SetVectorParameterByIndexInternal(0, FColor(0, 0, 1.0f, 1.0f));
 
-	// Set Material to Green
-	if (colorsEnum == EColorsEnum::VE_GREEN)
-		material->SetVectorParameterByIndexInternal(0, FColor(0, 1.0f, 0, 1.0f));
+	//// Set Material to Green
+	//if (colorsEnum == EColorsEnum::VE_GREEN)
+	//	material->SetVectorParameterByIndexInternal(0, FColor(0, 1.0f, 0, 1.0f));
 
-	// Set Material to Red
-	if (colorsEnum == EColorsEnum::VE_YELLOW)
-		material->SetVectorParameterByIndexInternal(0, FColor(1.0f, 1.0f, 0, 1.0f));
+	//// Set Material to Red
+	//if (colorsEnum == EColorsEnum::VE_YELLOW)
+	//	material->SetVectorParameterByIndexInternal(0, FColor(1.0f, 1.0f, 0, 1.0f));
 }
