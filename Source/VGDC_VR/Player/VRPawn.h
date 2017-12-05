@@ -36,6 +36,12 @@ private:
 	// Helps prevent us from hitting the controller
 	float TracingOffset = 5.0f;
 
+	// Set to true when the player pulls the trigger past the threshold,
+	//   set to false when the player releases the trigger past the threshold
+	// This way the player only fires once per trigger pull
+	bool isHoldingRightTrigger = false;
+	bool isHoldingLeftTrigger = false;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -68,30 +74,45 @@ public:
 
 	// Acts as a root component for the camera and controllers
 	// May not actually be necessary, but the VR template recommended it
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
 		USceneComponent* VROrigin;
 
 	// Player's camera
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
 		UCameraComponent* Camera;
 
 	// Motion controller for the left hand
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components|Left Hand")
 		UMotionControllerComponent* LeftController;
+
+	// Mesh for player's the left hand
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components|Left Hand")
+		UStaticMeshComponent* LeftControllerMesh;
 
 	// Component needed to allow the VR controllers to interact with 
 	//   UMG widgets
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components|Left Hand")
 		UWidgetInteractionComponent* LeftControllerInteractor;
 
 	// Motion controller for the right hand
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components|Right Hand")
 		UMotionControllerComponent* RightController;
+
+	// Mesh for player's the right hand
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components|Right Hand")
+		UStaticMeshComponent* RightControllerMesh;
 
 	// Component needed to allow the VR controllers to interact with 
 	//   UMG widgets
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components|Right Hand")
 		UWidgetInteractionComponent* RightControllerInteractor;
+
+	// How far the player has to pull on the trigger to fire
+	// Once this threshold is crossed, the weapon fires once
+	// When the trigger is loosened below this value, the gun can be fired again
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon",
+		META = (ClampMin = 0.0001f, ClampMax = 1.0f))
+		float WeaponSensitivity = 0.25f;
 
 	// How far we'll track the player's fire
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon",

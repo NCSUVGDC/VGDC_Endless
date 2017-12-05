@@ -6,6 +6,7 @@
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Runtime/Engine/Classes/Components/InputComponent.h"
 #include "Runtime/Engine/Classes/Engine/World.h"
+#include "../Environment/ShootableInterface.h"
 #include "DrawDebugHelpers.h"
 
 
@@ -81,17 +82,17 @@ AVRPawn::AVRPawn()
 	HeadsetMeshComp->bOwnerNoSee = true; // Do not render the headset for the player
 
 	// Initialize left controller mesh
-	UStaticMeshComponent* LeftControllerMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Left Controller Mesh"));
-	LeftControllerMeshComp->SetupAttachment(LeftController);
-	LeftControllerMeshComp->SetRelativeLocation(FVector(0.0f));
-	LeftControllerMeshComp->SetStaticMesh(ControllerMesh.Object);
+	LeftControllerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Left Controller Mesh"));
+	LeftControllerMesh->SetupAttachment(LeftController);
+	LeftControllerMesh->SetRelativeLocation(FVector(0.0f));
+	LeftControllerMesh->SetStaticMesh(ControllerMesh.Object);
 
 	// Initialize right controller mesh
-	UStaticMeshComponent* RightControllerMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Right Controller Mesh"));
-	RightControllerMeshComp->SetRelativeScale3D(FVector(1.0f, -1.0f, 1.0f)); // So that we don't have two left hands
-	RightControllerMeshComp->SetupAttachment(RightController);
-	RightControllerMeshComp->SetRelativeLocation(FVector(0.0f));
-	RightControllerMeshComp->SetStaticMesh(ControllerMesh.Object);
+	RightControllerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Right Controller Mesh"));
+	RightControllerMesh->SetRelativeScale3D(FVector(1.0f, -1.0f, 1.0f)); // So that we don't have two left hands
+	RightControllerMesh->SetupAttachment(RightController);
+	RightControllerMesh->SetRelativeLocation(FVector(0.0f));
+	RightControllerMesh->SetStaticMesh(ControllerMesh.Object);
 
 	
 
@@ -126,17 +127,27 @@ void AVRPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AVRPawn::RightTrigger(float Val)
 {
-	if (Val > 0.01f)
+	if (Val >= WeaponSensitivity && !isHoldingRightTrigger)
 	{
+		isHoldingRightTrigger = true;
 		WeaponTracing(RightController, Val);
+	}
+	else if (Val < WeaponSensitivity && isHoldingRightTrigger)
+	{
+		isHoldingRightTrigger = false;
 	}
 }
 
 void AVRPawn::LeftTrigger(float Val)
 {
-	if (Val > 0.01f)
+	if (Val >= WeaponSensitivity && !isHoldingLeftTrigger)
 	{
+		isHoldingLeftTrigger = true;
 		WeaponTracing(LeftController, Val);
+	}
+	else if (Val < WeaponSensitivity && isHoldingLeftTrigger)
+	{
+		isHoldingLeftTrigger = false;
 	}
 }
 
@@ -146,8 +157,7 @@ void AVRPawn::WeaponTracing(UMotionControllerComponent* Controller,
 	// Make sure firing sensitivity is valid
 	Sensitivity = FMath::Clamp(Sensitivity, 0.0f, 1.0f);
 
-	UE_LOG(LogTemp, Log, TEXT("Firing from %s | Sensitivity: %f"), 
-		*Controller->GetName(), Sensitivity);
+	
 
 	// Trace parameters
 	FVector TraceStart = Controller->GetComponentLocation() + (Controller->GetForwardVector() * TracingOffset);
@@ -158,11 +168,20 @@ void AVRPawn::WeaponTracing(UMotionControllerComponent* Controller,
 	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, 
 		ECollisionChannel::ECC_Visibility);
 
+
+
+	// Some Debug Stuff
+	UE_LOG(LogTemp, Log, TEXT("Firing from %s | Sensitivity: %f"),
+		*Controller->GetName(), Sensitivity);
+
 	if(DebugDrawWeaponRays)
-		DrawDebugLine(GetWorld(), TraceStart, TraceEnd,	FColor(0, 0, 255 * Sensitivity), false, -1.0f, 0, 1.0f);
+		DrawDebugLine(GetWorld(), TraceStart, TraceEnd,	FColor(0, 0, 255 * Sensitivity), false, -1.0f, 0, 3.0f);
+
+
 
 	if (Hit.bBlockingHit)
 	{
+		// Some Debug Stuff
 		UE_LOG(LogTemp, Log, TEXT("Blocking hit!"));
 		UE_LOG(LogTemp, Log, TEXT("Hit Component: %s | Hit location: %s"), 
 			*Hit.GetComponent()->GetName(), *Hit.Location.ToString());
@@ -170,17 +189,19 @@ void AVRPawn::WeaponTracing(UMotionControllerComponent* Controller,
 		if (DebugDrawWeaponHits)
 			DrawDebugSphere(GetWorld(), Hit.Location, 8.0f, 4, FColor(255, 0, 0));
 
-		/**  Here we could find out if the actor we hit is of our door crystal subclass:
-		
-		ATargetClass* HitActorAsTarget = Cast<ATargetClass>(Hit.GetActor());
 
-		if(HitActorAsTarget != nullptr)
+		// Check if actor is a Shootable actor
+		if (Hit.GetActor()->GetClass()->ImplementsInterface(UShootableInterface::StaticClass()))
 		{
-			UE_LOG(LogTemp, Log, TEXT("Hit a door's crystal!"));
-			HitActorAsTarget->TakeDamage(Sensitivity);
-			...
-		}
+			UE_LOG(LogTemp, Log, TEXT("Hit a shootable actor \"%s\"!"), *Hit.GetActor()->GetName());
 
-		*/
+			// How to call the interface function, as per Discord
+			// Docs say otherwise, but the docs say to do it in a way that doesn't compile
+			IShootableInterface::Execute_OnShot(Hit.GetActor());
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("Actor \"%s\" is not shootable!"), *Hit.GetActor()->GetName());
+		}
 	}
 }
