@@ -113,6 +113,7 @@ void AVRPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	UE_LOG(LogTemp, Log, TEXT("C++ Tick"));
 }
 
 // Called to bind functionality to input
@@ -127,8 +128,10 @@ void AVRPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AVRPawn::RightTrigger(float Val)
 {
+	UE_LOG(LogTemp, Log, TEXT("RT Function Called: %f"), Val);
 	if (Val >= WeaponSensitivity && !isHoldingRightTrigger)
 	{
+		UE_LOG(LogTemp, Log, TEXT("RT Holding"));
 		isHoldingRightTrigger = true;
 		WeaponTracing(RightController, Val);
 	}
@@ -140,8 +143,10 @@ void AVRPawn::RightTrigger(float Val)
 
 void AVRPawn::LeftTrigger(float Val)
 {
+	UE_LOG(LogTemp, Log, TEXT("LT Function Called: %f"), Val);
 	if (Val >= WeaponSensitivity && !isHoldingLeftTrigger)
 	{
+		UE_LOG(LogTemp, Log, TEXT("LT Holding"));
 		isHoldingLeftTrigger = true;
 		WeaponTracing(LeftController, Val);
 	}
