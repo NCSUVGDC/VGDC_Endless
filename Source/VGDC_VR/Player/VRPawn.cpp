@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "VRPawn.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
+#include "Runtime/Engine/Classes/Kismet/HeadMountedDisplayFunctionLibrary.h"
 #include "Runtime/Engine/Classes/Components/StaticMeshComponent.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Runtime/Engine/Classes/Components/InputComponent.h"
@@ -154,8 +154,9 @@ void AVRPawn::LeftTrigger(float Val)
 void AVRPawn::WeaponTracing(UMotionControllerComponent* Controller, 
 	float Sensitivity)
 {
+	// Firing is handled in Blueprints b/c we just want to keep everything in blueprints
 	// Make sure firing sensitivity is valid
-	Sensitivity = FMath::Clamp(Sensitivity, 0.0f, 1.0f);
+	/*Sensitivity = FMath::Clamp(Sensitivity, 0.0f, 1.0f);
 
 	
 
@@ -203,5 +204,5 @@ void AVRPawn::WeaponTracing(UMotionControllerComponent* Controller,
 		{
 			UE_LOG(LogTemp, Log, TEXT("Actor \"%s\" is not shootable!"), *Hit.GetActor()->GetName());
 		}
-	}
+	}*/
 }
