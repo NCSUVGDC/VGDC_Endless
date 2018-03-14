@@ -32,3 +32,31 @@ void UHubWallsTest::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	// ...
 }
 
+//returns equivalent angles between -180 and 180. Excludes -180
+float UHubWallsTest::KeepDegreesUnder180(float deg)
+{
+	while (deg > 180)
+		deg = deg - 360;
+	while (deg < -180)
+		deg = deg + 360;
+	if (deg > -180.1f && deg < -179.9f)
+		deg = 180.0000f;
+	return deg;
+}
+
+//Returns True if degrees are within the tolerance, including at -180/180 case
+bool UHubWallsTest::NearlyEqualDegrees(float deg1, float deg2, float tolerance)
+{
+	if (deg2 > (deg1 - tolerance) && deg2 < (deg1 + tolerance))
+	{
+		return true;
+	}
+	else
+		if (deg1 > 179.9f && deg1 < 180.1f)
+		{
+			return UHubWallsTest::NearlyEqualDegrees(-180.0f, deg2, tolerance);
+		}
+		
+	return false;
+
+}
