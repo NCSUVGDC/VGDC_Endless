@@ -1,5 +1,4 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-using namespace UF;
 #pragma once
 
 #include "CoreMinimal.h"
@@ -23,12 +22,18 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-public:
-	UFUNCTION(BlueprintCallable, Category = "Hub")
-	static float KeepDegreesUnder180(float deg);
+	/**
+	 * Returns equivalent angles between -180 and 180. Excludes -180
+	 * NOTE: Already exists in blueprints; see "Normalize Axis"
+	 */
+	/*UFUNCTION(BlueprintCallable, Category = "Hub")
+		static float KeepDegreesUnder180(float deg);*/
 		
-public:
-	UFUNCTION(BlueprintPure, Category = "Hub")
-	static bool NearlyEqualDegrees(float deg1,float deg2, float tolerance);
+	/**
+	 * Returns True if degrees are within the tolerance, including at -180/180 case
+	 * NOTE: Already exists as FRotator::Equals in C++ or Rotator == operation in Blueprints
+	 */
+	//UFUNCTION(BlueprintPure, Category = "Hub")
+	//	static bool NearlyEqualDegrees(float deg1, float deg2, float tolerance = 0.01f);
 	
 };
