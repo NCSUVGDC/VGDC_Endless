@@ -3,6 +3,7 @@
 #include "VRPawn.h"
 #include "Runtime/Engine/Classes/Kismet/HeadMountedDisplayFunctionLibrary.h"
 #include "Runtime/Engine/Classes/Components/StaticMeshComponent.h"
+#include "Runtime/Engine/Classes/Components/SkeletalMeshComponent.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Runtime/Engine/Classes/Components/InputComponent.h"
 #include "Runtime/Engine/Classes/Engine/World.h"
@@ -70,9 +71,9 @@ AVRPawn::AVRPawn()
 		UE_LOG(LogTemp, Error, TEXT("Failed to load headset mesh!"));
 
 	// Get the in-engine Oculus Touch mesh
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> ControllerMesh(TEXT("StaticMesh'/Engine/VREditor/Devices/Oculus/OculusControllerMesh.OculusControllerMesh'"));
+	/*static ConstructorHelpers::FObjectFinder<UStaticMesh> ControllerMesh(TEXT("StaticMesh'/Engine/VREditor/Devices/Oculus/OculusControllerMesh.OculusControllerMesh'"));
 	if (ControllerMesh.Object == nullptr)
-		UE_LOG(LogTemp, Error, TEXT("Failed to load controller mesh!"));
+		UE_LOG(LogTemp, Error, TEXT("Failed to load controller mesh!"));*/
 
 	// Initialize headset mesh
 	UStaticMeshComponent* HeadsetMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HMD Mesh"));
@@ -82,17 +83,17 @@ AVRPawn::AVRPawn()
 	HeadsetMeshComp->bOwnerNoSee = true; // Do not render the headset for the player
 
 	// Initialize left controller mesh
-	LeftControllerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Left Controller Mesh"));
-	LeftControllerMesh->SetupAttachment(LeftController);
-	LeftControllerMesh->SetRelativeLocation(FVector(0.0f));
-	LeftControllerMesh->SetStaticMesh(ControllerMesh.Object);
+	//LeftControllerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Left Controller Mesh"));
+	//LeftControllerMesh->SetupAttachment(LeftController);
+	//LeftControllerMesh->SetRelativeLocation(FVector(0.0f));
+	//LeftControllerMesh->SetStaticMesh(ControllerMesh.Object);
 
 	// Initialize right controller mesh
-	RightControllerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Right Controller Mesh"));
-	RightControllerMesh->SetRelativeScale3D(FVector(1.0f, -1.0f, 1.0f)); // So that we don't have two left hands
-	RightControllerMesh->SetupAttachment(RightController);
-	RightControllerMesh->SetRelativeLocation(FVector(0.0f));
-	RightControllerMesh->SetStaticMesh(ControllerMesh.Object);
+	//RightControllerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Right Controller Mesh"));
+	//RightControllerMesh->SetRelativeScale3D(FVector(1.0f, -1.0f, 1.0f)); // So that we don't have two left hands
+	//RightControllerMesh->SetupAttachment(RightController);
+	//RightControllerMesh->SetRelativeLocation(FVector(0.0f));
+	//RightControllerMesh->SetStaticMesh(ControllerMesh.Object);
 
 	
 
