@@ -35,19 +35,21 @@ AVRPawn::AVRPawn()
 
 	/// MotionControllers setup
 	// Make sure we snap the controllers to the pawn properly
-	FAttachmentTransformRules ControllerAttachRules =
-		FAttachmentTransformRules(EAttachmentRule::SnapToTarget,
-			EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
+	//FAttachmentTransformRules ControllerAttachRules =
+	//	FAttachmentTransformRules(EAttachmentRule::SnapToTarget,
+	//		EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
 
 	// Initialize left controller
 	LeftController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("Left Controller"));
-	LeftController->AttachToComponent(VROrigin, ControllerAttachRules);
+	//LeftController->AttachToComponent(VROrigin, ControllerAttachRules);
+	LeftController->SetupAttachment(VROrigin);
 	LeftController->SetRelativeLocation(FVector(0.0f));
 	LeftController->Hand = EControllerHand::Left;
 
 	// Initialize right controller
 	RightController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("Right Controller"));
-	RightController->AttachToComponent(VROrigin, ControllerAttachRules);
+	//RightController->AttachToComponent(VROrigin, ControllerAttachRules);
+	RightController->SetupAttachment(VROrigin);
 	RightController->SetRelativeLocation(FVector(0.0f));
 	RightController->Hand = EControllerHand::Right;
 
