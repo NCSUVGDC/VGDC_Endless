@@ -13,8 +13,10 @@ UCLASS()
 class VGDC_VR_API AVGDC_VRGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
-	
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "Game Mode Base")
+	void ResetCurrentLevel();
 	
 	
 };
