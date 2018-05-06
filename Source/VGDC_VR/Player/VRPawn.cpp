@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "VRPawn.h"
-#include "Runtime/Engine/Classes/Kismet/HeadMountedDisplayFunctionLibrary.h"
+#include "HeadMountedDisplayFunctionLibrary.h"
 #include "Runtime/Engine/Classes/Components/StaticMeshComponent.h"
 #include "Runtime/Engine/Classes/Components/SkeletalMeshComponent.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
@@ -44,14 +44,14 @@ AVRPawn::AVRPawn()
 	//LeftController->AttachToComponent(VROrigin, ControllerAttachRules);
 	LeftController->SetupAttachment(VROrigin);
 	LeftController->SetRelativeLocation(FVector(0.0f));
-	LeftController->Hand = EControllerHand::Left;
+	LeftController->SetTrackingSource(EControllerHand::Left);
 
 	// Initialize right controller
 	RightController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("Right Controller"));
 	//RightController->AttachToComponent(VROrigin, ControllerAttachRules);
 	RightController->SetupAttachment(VROrigin);
 	RightController->SetRelativeLocation(FVector(0.0f));
-	RightController->Hand = EControllerHand::Right;
+	RightController->SetTrackingSource(EControllerHand::Right);
 
 
 
