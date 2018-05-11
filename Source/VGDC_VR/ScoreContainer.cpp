@@ -15,4 +15,10 @@ FString UScoreContainer::ToString()
 }
 
 
-
+UScoreContainer* UScoreContainer::CreateScoreContainer(FString Name, int32 Score)
+{
+	UScoreContainer* newScore = NewObject<UScoreContainer>();
+	newScore->SetNameAndScore(Name, Score);
+	UE_LOG(LogTemp, Log, TEXT("Created new score container: %s"), *newScore->ToString());
+	return newScore;
+}

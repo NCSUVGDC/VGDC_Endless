@@ -14,6 +14,9 @@ class VGDC_VR_API UScoreContainer: public UObject
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintPure, Category = "Score Container")
+		static UScoreContainer* CreateScoreContainer(FString Name, int32 Score);
+
 	// Sets the score and name for the ScoreContainer object
 	UFUNCTION(BlueprintCallable, Category = "Score Container")
 	void SetNameAndScore(FString _name, int32 _score);

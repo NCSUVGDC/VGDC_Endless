@@ -26,23 +26,28 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
 	void GetHighScores(FString filename, TArray<UScoreContainer*>& highScores);
 
-	// Retrieves any existing high scores from file and readjusts them with the current high score in mind
-	// and rewrites them to the file
+	// Adds a new high score to the leaderboard
+	// TODO: This should take a name and integer for parameters and create a new entry from those...
 	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
-	void AddHighScore(FString filename, UScoreContainer* newEntry);
+		void AddHighScore(UScoreContainer* newEntry);
 
 	// Adds Leaderboard to file
 	// TODO: Also writes file immediately - something AddHighScore does not do. Such functionality should be moved to a separate function
+	//UFUNCTION(BlueprintCallable, Category = "Score Keeping")
+	//void AddHighScores(TArray<UScoreContainer*> newEntries);
+
+	// Saves leaderboard to file, overwriting old file by default
 	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
-	void AddHighScores(FString fileName, TArray<UScoreContainer*> newEntries);
+		void SaveLeaderboard(FString fileName);
 
 	// Test function to write to a file
 	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
 	void TestWrite(FString fileName, UScoreContainer* whatToWrite);
 
 	// Creates a ScoreContainer UObject representing the player's name and score
-	UFUNCTION(BlueprintPure, Category = "Score Keeping")
-	UScoreContainer* CreateLeaderboardEntry(FString _name, int32 _score);
+	// Moved to ScoreContainer class
+	//UFUNCTION(BlueprintPure, Category = "Score Keeping")
+	//UScoreContainer* CreateLeaderboardEntry(FString _name, int32 _score);
 
 	// Checks if file exists
 	// TODO: Don't see this used anywhere. Do we still need this?
