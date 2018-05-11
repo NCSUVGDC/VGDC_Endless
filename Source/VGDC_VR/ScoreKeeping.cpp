@@ -47,7 +47,10 @@ void AScoreKeeping::GetHighScores(FString filename, TArray<UScoreContainer*>& hi
 
 			highScores.Add(entry);
 		}
-			
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to open leaderboard file: %s"), *filename);
 	}
 
 }
@@ -61,19 +64,23 @@ void AScoreKeeping::AddHighScore(FString filename, UScoreContainer* newEntry)
 	FString pathToFile = savedDir + "/" + filename + ".csv";	
 	
 	// Retrieve all the current high scores
-	GetHighScores(filename, leaderboard);
+	// TODO: Should we be re-loading each time? Seems kinda overkill.
+	//GetHighScores(filename, leaderboard);
 	
+	UE_LOG(LogTemp, Log, TEXT("Adding new high score: %s"), *newEntry->ToString());
+
 	// Add new leaderboard entry to list of high scores
 	leaderboard.Add(newEntry);
 	
 	// Sorts leaderboard entries
 	leaderboard.Sort();
 	
-
-	// If the number of entries in the leaderboard are more than its max
+	// Remove low scores if leaderboard is full
 	if (leaderboard.Num() > leaderboardMax)
-		// Remove the lowest score
+	{
+		UE_LOG(LogTemp, Log, TEXT("Board full! Popping lowest high score: %s"), *leaderboard[leaderboardMax - 1]->ToString());
 		leaderboard.RemoveAt(leaderboardMax - 1);
+	}
 	
 
 	
@@ -81,11 +88,13 @@ void AScoreKeeping::AddHighScore(FString filename, UScoreContainer* newEntry)
 
 void AScoreKeeping::AddHighScores(FString fileName, TArray<UScoreContainer*> newEntries)
 {
+	for(UScoreContainer* newEntry : newEntries)
+		AddHighScore(fileName, newEntry);
+
+
+	// TODO: Here below is auto-writing the file. This should be moved to a separate function.
+	
 	FString fileNameAndPath = FPaths::GameSavedDir() + "/" + fileName + ".csv";
-
-	leaderboard.Append(newEntries);
-
-	leaderboard.Sort();
 
 	FString leaderboardAsString = "";	
 
@@ -115,22 +124,20 @@ void AScoreKeeping::TestWrite(FString fileName, UScoreContainer* whatToWrite)
 	FFileHelper::SaveStringToFile(whatToWrite->ToString(), *fileNameAndPath);
 }
 
-UScoreContainer * AScoreKeeping::CreateLeaderboardEntry(FString username, int32 highscore)
+UScoreContainer* AScoreKeeping::CreateLeaderboardEntry(FString username, int32 highscore)
 {
-	UScoreContainer* temp = NewObject<UScoreContainer>();
-	temp->SetNameAndScore(username, highscore);
-	return temp;
+	UScoreContainer* newScore = NewObject<UScoreContainer>();
+	newScore->SetNameAndScore(username, highscore);
+	UE_LOG(LogTemp, Log, TEXT("Created new score entry: %s"), *newScore->ToString());
+	return newScore;
 }
 
 bool AScoreKeeping::isNewHighScore(int32 _score)
 {
-	// If no leaderboard entries
-	if (leaderboard.Num() <= 0)
-		// New High Score
+	// High score by default if leaderboard isn't full
+	if (leaderboard.Num() <= leaderboardMax)
 		return true;
-	// Else if there are leaderboard entries
-	else
-		// Check if current score is higher than any of the leaderboard scores
+	else // Check if current score is higher than any of the leaderboard scores
 		for (int i = leaderboard.Num() - 1; i >= 0; i--)
 			if (leaderboard[i]->score < _score)
 				return true;

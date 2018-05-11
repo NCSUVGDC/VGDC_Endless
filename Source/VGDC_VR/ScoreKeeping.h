@@ -32,6 +32,7 @@ public:
 	void AddHighScore(FString filename, UScoreContainer* newEntry);
 
 	// Adds Leaderboard to file
+	// TODO: Also writes file immediately - something AddHighScore does not do. Such functionality should be moved to a separate function
 	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
 	void AddHighScores(FString fileName, TArray<UScoreContainer*> newEntries);
 
@@ -44,6 +45,7 @@ public:
 	UScoreContainer* CreateLeaderboardEntry(FString _name, int32 _score);
 
 	// Checks if file exists
+	// TODO: Don't see this used anywhere. Do we still need this?
 	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
 	bool bFileExists(FString filename);
 
