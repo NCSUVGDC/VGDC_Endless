@@ -85,9 +85,11 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components|Left Hand")
 		UMotionControllerComponent* LeftController;
 
+	// Hand some weird crap happening with the engine not letting us assign meshes
+	// Moved to purely BP
 	// Mesh for player's the left hand
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components|Left Hand")
-		UStaticMeshComponent* LeftControllerMesh;
+	//UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components|Left Hand")
+	//	USkeletalMeshComponent* LeftControllerMesh;
 
 	// Component needed to allow the VR controllers to interact with 
 	//   UMG widgets
@@ -97,10 +99,12 @@ public:
 	// Motion controller for the right hand
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components|Right Hand")
 		UMotionControllerComponent* RightController;
-
+	
+	// Hand some weird crap happening with the engine not letting us assign meshes
+	// Moved to purely BP
 	// Mesh for player's the right hand
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components|Right Hand")
-		UStaticMeshComponent* RightControllerMesh;
+	//UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components|Right Hand")
+	//	USkeletalMeshComponent* RightControllerMesh;
 
 	// Component needed to allow the VR controllers to interact with 
 	//   UMG widgets

@@ -3,6 +3,7 @@
 #include "VRPawn.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Runtime/Engine/Classes/Components/StaticMeshComponent.h"
+#include "Runtime/Engine/Classes/Components/SkeletalMeshComponent.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Runtime/Engine/Classes/Components/InputComponent.h"
 #include "Runtime/Engine/Classes/Engine/World.h"
@@ -34,21 +35,23 @@ AVRPawn::AVRPawn()
 
 	/// MotionControllers setup
 	// Make sure we snap the controllers to the pawn properly
-	FAttachmentTransformRules ControllerAttachRules =
-		FAttachmentTransformRules(EAttachmentRule::SnapToTarget,
-			EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
+	//FAttachmentTransformRules ControllerAttachRules =
+	//	FAttachmentTransformRules(EAttachmentRule::SnapToTarget,
+	//		EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false);
 
 	// Initialize left controller
 	LeftController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("Left Controller"));
-	LeftController->AttachToComponent(VROrigin, ControllerAttachRules);
+	//LeftController->AttachToComponent(VROrigin, ControllerAttachRules);
+	LeftController->SetupAttachment(VROrigin);
 	LeftController->SetRelativeLocation(FVector(0.0f));
-	LeftController->Hand = EControllerHand::Left;
+	LeftController->SetTrackingSource(EControllerHand::Left);
 
 	// Initialize right controller
 	RightController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("Right Controller"));
-	RightController->AttachToComponent(VROrigin, ControllerAttachRules);
+	//RightController->AttachToComponent(VROrigin, ControllerAttachRules);
+	RightController->SetupAttachment(VROrigin);
 	RightController->SetRelativeLocation(FVector(0.0f));
-	RightController->Hand = EControllerHand::Right;
+	RightController->SetTrackingSource(EControllerHand::Right);
 
 
 
@@ -70,9 +73,9 @@ AVRPawn::AVRPawn()
 		UE_LOG(LogTemp, Error, TEXT("Failed to load headset mesh!"));
 
 	// Get the in-engine Oculus Touch mesh
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> ControllerMesh(TEXT("StaticMesh'/Engine/VREditor/Devices/Oculus/OculusControllerMesh.OculusControllerMesh'"));
+	/*static ConstructorHelpers::FObjectFinder<UStaticMesh> ControllerMesh(TEXT("StaticMesh'/Engine/VREditor/Devices/Oculus/OculusControllerMesh.OculusControllerMesh'"));
 	if (ControllerMesh.Object == nullptr)
-		UE_LOG(LogTemp, Error, TEXT("Failed to load controller mesh!"));
+		UE_LOG(LogTemp, Error, TEXT("Failed to load controller mesh!"));*/
 
 	// Initialize headset mesh
 	UStaticMeshComponent* HeadsetMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HMD Mesh"));
@@ -82,17 +85,17 @@ AVRPawn::AVRPawn()
 	HeadsetMeshComp->bOwnerNoSee = true; // Do not render the headset for the player
 
 	// Initialize left controller mesh
-	LeftControllerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Left Controller Mesh"));
-	LeftControllerMesh->SetupAttachment(LeftController);
-	LeftControllerMesh->SetRelativeLocation(FVector(0.0f));
-	LeftControllerMesh->SetStaticMesh(ControllerMesh.Object);
+	//LeftControllerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Left Controller Mesh"));
+	//LeftControllerMesh->SetupAttachment(LeftController);
+	//LeftControllerMesh->SetRelativeLocation(FVector(0.0f));
+	//LeftControllerMesh->SetStaticMesh(ControllerMesh.Object);
 
 	// Initialize right controller mesh
-	RightControllerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Right Controller Mesh"));
-	RightControllerMesh->SetRelativeScale3D(FVector(1.0f, -1.0f, 1.0f)); // So that we don't have two left hands
-	RightControllerMesh->SetupAttachment(RightController);
-	RightControllerMesh->SetRelativeLocation(FVector(0.0f));
-	RightControllerMesh->SetStaticMesh(ControllerMesh.Object);
+	//RightControllerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Right Controller Mesh"));
+	//RightControllerMesh->SetRelativeScale3D(FVector(1.0f, -1.0f, 1.0f)); // So that we don't have two left hands
+	//RightControllerMesh->SetupAttachment(RightController);
+	//RightControllerMesh->SetRelativeLocation(FVector(0.0f));
+	//RightControllerMesh->SetStaticMesh(ControllerMesh.Object);
 
 	
 
@@ -154,8 +157,9 @@ void AVRPawn::LeftTrigger(float Val)
 void AVRPawn::WeaponTracing(UMotionControllerComponent* Controller, 
 	float Sensitivity)
 {
+	// Firing is handled in Blueprints b/c we just want to keep everything in blueprints
 	// Make sure firing sensitivity is valid
-	Sensitivity = FMath::Clamp(Sensitivity, 0.0f, 1.0f);
+	/*Sensitivity = FMath::Clamp(Sensitivity, 0.0f, 1.0f);
 
 	
 
@@ -203,5 +207,5 @@ void AVRPawn::WeaponTracing(UMotionControllerComponent* Controller,
 		{
 			UE_LOG(LogTemp, Log, TEXT("Actor \"%s\" is not shootable!"), *Hit.GetActor()->GetName());
 		}
-	}
+	}*/
 }
