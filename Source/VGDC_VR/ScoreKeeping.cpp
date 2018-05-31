@@ -18,7 +18,7 @@ AScoreKeeping::AScoreKeeping()
 // Returns an array of FStrings representing players and their high scores
 void AScoreKeeping::GetHighScores(FString filename, TArray<UScoreContainer*>& highScores)
 {
-	FString savedDir = FPaths::GameSavedDir();
+	FString savedDir = FPaths::ProjectSavedDir();
 
 	FString pathToFile = savedDir + "/" + filename + ".csv";
 
@@ -115,7 +115,7 @@ void AScoreKeeping::AddHighScore(UScoreContainer* newEntry)
 
 void AScoreKeeping::SaveLeaderboard(FString fileName)
 {
-	FString fileNameAndPath = FPaths::GameSavedDir() + "/" + fileName + ".csv";
+	FString fileNameAndPath = FPaths::ProjectSavedDir() + "/" + fileName + ".csv";
 
 	FString leaderboardAsString = "";	
 
@@ -136,7 +136,7 @@ void AScoreKeeping::SaveLeaderboard(FString fileName)
 
 void AScoreKeeping::TestWrite(FString fileName, UScoreContainer* whatToWrite)
 {
-	FString fileNameAndPath = FPaths::GameSavedDir() + "/" + fileName + ".csv";
+	FString fileNameAndPath = FPaths::ProjectSavedDir() + "/" + fileName + ".csv";
 	
 	FFileHelper::SaveStringToFile(whatToWrite->ToString(), *fileNameAndPath);
 }
