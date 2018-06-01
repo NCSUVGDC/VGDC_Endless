@@ -11,7 +11,7 @@
 AScoreKeeping::AScoreKeeping()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 }
 
@@ -64,10 +64,8 @@ void AScoreKeeping::AddHighScore(UScoreContainer* newEntry)
 	
 	UE_LOG(LogTemp, Log, TEXT("Adding new high score: %s"), *newEntry->ToString());
 
-	// Add new leaderboard entry to list of high scores
 	leaderboard.Add(newEntry);
 	
-	// Sorts leaderboard entries
 	leaderboard.Sort();
 	
 	// Remove low scores if leaderboard is full
@@ -119,6 +117,8 @@ void AScoreKeeping::SaveLeaderboard(FString fileName)
 
 	FString leaderboardAsString = "";	
 
+	leaderboard.Sort();
+
 	// Convert leaderboard entries to string 
 	for (int32 i = leaderboard.Num() - 1; i >= 0; i--)
 	{
@@ -162,23 +162,9 @@ bool AScoreKeeping::isNewHighScore(int32 _score)
 	return false;
 }
 
-// Called when the game starts or when spawned
-void AScoreKeeping::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
 bool AScoreKeeping::bFileExists(FString filename)
 {
 	return FPaths::FileExists(filename);
-}
-
-// Called every frame
-void AScoreKeeping::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 

@@ -19,12 +19,9 @@ public:
 	// Sets default values for this actor's properties
 	AScoreKeeping();
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	// Returns an array of FStrings representing players and their high scores
 	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
-	void GetHighScores(FString filename, TArray<UScoreContainer*>& highScores);
+		void GetHighScores(FString filename, TArray<UScoreContainer*>& highScores);
 
 	// Adds a new high score to the leaderboard
 	// TODO: This should take a name and integer for parameters and create a new entry from those...
@@ -42,7 +39,7 @@ public:
 
 	// Test function to write to a file
 	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
-	void TestWrite(FString fileName, UScoreContainer* whatToWrite);
+		void TestWrite(FString fileName, UScoreContainer* whatToWrite);
 
 	// Creates a ScoreContainer UObject representing the player's name and score
 	// Moved to ScoreContainer class
@@ -52,23 +49,20 @@ public:
 	// Checks if file exists
 	// TODO: Don't see this used anywhere. Do we still need this?
 	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
-	bool bFileExists(FString filename);
+		bool bFileExists(FString filename);
 
 	// Checks if there is a new high score
 	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
-	bool isNewHighScore(int32 _score);
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+		bool isNewHighScore(int32 _score);
 
-public:	
 	// Maximum leaderboard entries
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Score Keeping")
-	int leaderboardMax = 5;
+		int leaderboardMax = 5;
 
-	// Contains Players' Name and Score
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Score Keeping")
-	TArray<UScoreContainer*> leaderboard;
+	// Sorted array of scores
+	// Read only because you should only use the AddHighScore method for adding scores
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score Keeping")
+		TArray<UScoreContainer*> leaderboard;
 	
 
 	
