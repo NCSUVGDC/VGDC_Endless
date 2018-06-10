@@ -17,6 +17,11 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Score Container")
 		static UScoreContainer* CreateScoreContainer(FString Name, int32 Score);
 
+	UFUNCTION( BlueprintPure, Category = "Score Container", META = (AdvancedDisplay="0") )
+		static UScoreContainer* CreateRandomScoreContainer(
+			int32 NameMinLength = 3, int32 NameMaxLength = 3, 
+			int32 ScoreMin = 1000, int32 ScoreMax = 9999999);
+
 	// Turns class into a string
 	UFUNCTION(BlueprintPure, Category = "Score Container")
 		FString ToString();
