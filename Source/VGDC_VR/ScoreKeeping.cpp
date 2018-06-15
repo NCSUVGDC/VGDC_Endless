@@ -92,6 +92,7 @@ bool AScoreKeeping::AddHighScoreContainer(UScoreContainer* NewEntry)
 	// Remove low score(s) if leaderboard is full
 	while (Leaderboard.Num() > MaxEntries)
 	{
+		// TODO Pop removes the highest score. Work on sorting and popping and make sure order is making sense.
 		UE_LOG(LogTemp, Log, TEXT("Board full! Popping lowest high score: %s"), *Leaderboard.Pop()->ToString());
 	}
 
