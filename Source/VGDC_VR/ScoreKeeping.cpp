@@ -19,6 +19,12 @@ void AScoreKeeping::BeginDestroy()
 
 	if (Autosave)
 	{
+		if (Leaderboard.Num() <= 0)
+		{
+			UE_LOG(LogTemp, Log, TEXT("NOT autosaving leaderboard (zero entries!)"));
+			return;
+		}
+
 		UE_LOG(LogTemp, Log, TEXT("Autosaving leaderboard!"));
 		SaveLeaderboard();
 	}
@@ -42,7 +48,7 @@ void AScoreKeeping::LoadLeaderboard(FString inFilename)
 		FFileHelper::LoadFileToString(RawText, *PathToFile);
 		RawText.ParseIntoArray(CSVEntries, TEXT("\n"));
 
-		UE_LOG(LogTemp, Log, TEXT("Loading %d entries from file %s..."), CSVEntries.Num(), *inFilename);
+		UE_LOG(LogTemp, Log, TEXT("Loading %d entries from file %s..."), CSVEntries.Num(), *PathToFile);
 		
 		// And then add them to the TMap
 		for (FString CSVEntry : CSVEntries)
@@ -59,7 +65,7 @@ void AScoreKeeping::LoadLeaderboard(FString inFilename)
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to open leaderboard file: %s"), *inFilename);
+		UE_LOG(LogTemp, Warning, TEXT("Failed to open leaderboard file: %s"), *PathToFile);
 	}
 
 }
@@ -111,7 +117,7 @@ void AScoreKeeping::SaveLeaderboard(FString inFilename)
 
 	FFileHelper::SaveStringToFile(LeaderboardAsString, *FullFilePath);
 
-	UE_LOG(LogTemp, Log, TEXT("Saved leaderboard to file: %s"), *FullFilePath);
+	UE_LOG(LogTemp, Log, TEXT("Saved leaderboard with %d entries to file: %s"), Leaderboard.Num(), *FullFilePath);
 }
 
 bool AScoreKeeping::IsNewHighScore(int32 Score) const
