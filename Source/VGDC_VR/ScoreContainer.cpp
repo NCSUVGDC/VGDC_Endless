@@ -33,3 +33,26 @@ UScoreContainer* UScoreContainer::CreateRandomScoreContainer(
 	return UScoreContainer::CreateScoreContainer(FString(ANSI_TO_TCHAR(NameArray)), 
 		FMath::RandRange(ScoreMin, ScoreMax));
 }
+
+void UScoreContainer::SetNameCharacter(int Index, FString Character)
+{
+	TArray<TCHAR> CharArray = name.GetCharArray();
+
+	if (Index < 0 || Index >= CharArray.Num())
+	{
+		UE_LOG(LogTemp, Error, TEXT("SetNameCharacter called with Index %d not in [0, %d)"), Index, CharArray.Num());
+		return;
+	}
+
+	if (Character.Len() != 1)
+	{
+		UE_LOG(LogTemp, Error, TEXT("SetNameCharacter called with Character.Len() %d != 1"), Character.Len());
+		return;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Changing name '%s' character %d to '%c'"), *name, Index, Character[0]);
+
+	CharArray[Index] = Character[0];
+
+	name = FString(CharArray.GetData());
+}

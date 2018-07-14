@@ -22,6 +22,10 @@ public:
 			int32 NameMinLength = 3, int32 NameMaxLength = 3, 
 			int32 ScoreMin = 1000, int32 ScoreMax = 9999999);
 
+	// Changes the character of the name at the given index
+	UFUNCTION(BlueprintCallable, Category = "Score Container")
+		void SetNameCharacter(int Index, FString Character);
+
 	// Turns class into a string
 	UFUNCTION(BlueprintPure, Category = "Score Container")
 		FString ToString();
