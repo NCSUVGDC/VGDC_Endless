@@ -77,26 +77,17 @@ bool AScoreKeeping::AddHighScore(FString Name, int32 Score)
 
 bool AScoreKeeping::AddHighScoreContainer(UScoreContainer* NewEntry)
 {
-	if (!IsNewHighScore(NewEntry->score))
-	{
-		UE_LOG(LogTemp, Log, TEXT("New score %d not a high score!"));
-		return false;
-	}
+	bool IsHighScore = IsNewHighScore(NewEntry->score);
 
-	UE_LOG(LogTemp, Log, TEXT("Adding new high score: %s"), *NewEntry->ToString());
+	UE_LOG( LogTemp, Log, TEXT("Adding new %s: %s"), 
+		IsHighScore ? TEXT("high score") : TEXT("(not high) score"), 
+		*NewEntry->ToString() );
 
 	Leaderboard.Add(NewEntry);
 	
 	Leaderboard.Sort();
 	
-	// Remove low score(s) if leaderboard is full
-	while (Leaderboard.Num() > MaxEntries)
-	{
-		// TODO Pop removes the highest score. Work on sorting and popping and make sure order is making sense.
-		UE_LOG(LogTemp, Log, TEXT("Board full! Popping lowest high score: %s"), *Leaderboard.Pop()->ToString());
-	}
-
-	return true;
+	return IsHighScore;
 }
 
 void AScoreKeeping::SaveLeaderboard(FString inFilename)
@@ -123,21 +114,11 @@ void AScoreKeeping::SaveLeaderboard(FString inFilename)
 
 bool AScoreKeeping::IsNewHighScore(int32 Score) const
 {
-	// High score by default if leaderboard isn't full
-	if (Leaderboard.Num() <= MaxEntries)
+	if (Leaderboard.Num() < HighScoreCount)
 		return true;
-	else // Check if current score is higher than any of the leaderboard scores
-		for (UScoreContainer* Entry : Leaderboard)
-			if (Entry->score < Score)
-				return true;
-	
-	return false;
+	else
+		return Score > Leaderboard[HighScoreCount - 1]->score;
 }
-
-/*bool AScoreKeeping::bFileExists(FString filename)
-{
-	return FPaths::FileExists(filename);
-}*/
 
 
 

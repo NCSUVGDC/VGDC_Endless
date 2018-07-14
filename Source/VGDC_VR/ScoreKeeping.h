@@ -38,14 +38,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
 		void SaveLeaderboard(FString inFilename = "");
 
-	// Checks if there is a new high score
+	// Checks if the given score is greater than the score at place HighScoreCount
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Score Keeping")
 		bool IsNewHighScore(int32 Score) const;
 
-	// Maximum leaderboard entries
-	// Lowest scores will be popped off if necessary to make room for new ones
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Score Keeping")
-		int MaxEntries = 10;
+	// Top N scores are considered high scores
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Score Keeping",
+		META = (ClampMin = 1, ClampMax = 100, UIMax = 50))
+		int HighScoreCount = 10;
 
 	// Should this score keeper automatically save when destroyed?
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Score Keeping")
