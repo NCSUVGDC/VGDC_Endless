@@ -38,6 +38,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
 		void SaveLeaderboard(FString inFilename = "");
 
+	// Sorts descending
+	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
+		void Sort();
+
 	// Checks if the given score is greater than the score at place HighScoreCount
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Score Keeping")
 		bool IsNewHighScore(int32 Score) const;

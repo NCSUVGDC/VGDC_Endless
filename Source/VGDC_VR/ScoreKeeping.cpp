@@ -5,6 +5,7 @@
 #include "Misc/FileHelper.h"
 #include "HAL/FileManager.h"
 #include "HAL/PlatformFilemanager.h"
+#include <functional> // For Sorting
 
 
 // Sets default values
@@ -83,9 +84,9 @@ bool AScoreKeeping::AddHighScoreContainer(UScoreContainer* NewEntry)
 		IsHighScore ? TEXT("high score") : TEXT("(not high) score"), 
 		*NewEntry->ToString() );
 
+	// TODO THIS IS INSANELY INEFFICIENT
 	Leaderboard.Add(NewEntry);
-	
-	Leaderboard.Sort();
+	Sort();
 	
 	return IsHighScore;
 }
@@ -100,7 +101,7 @@ void AScoreKeeping::SaveLeaderboard(FString inFilename)
 
 	FString LeaderboardAsString = "";	
 
-	Leaderboard.Sort();
+	Sort();
 
 	for (UScoreContainer* Entry : Leaderboard)
 	{
@@ -110,6 +111,11 @@ void AScoreKeeping::SaveLeaderboard(FString inFilename)
 	FFileHelper::SaveStringToFile(LeaderboardAsString, *FullFilePath);
 
 	UE_LOG(LogTemp, Log, TEXT("Saved leaderboard with %d entries to file: %s"), Leaderboard.Num(), *FullFilePath);
+}
+
+void AScoreKeeping::Sort()
+{
+	Leaderboard.Sort<std::greater<UScoreContainer>>( std::greater<UScoreContainer>() );
 }
 
 bool AScoreKeeping::IsNewHighScore(int32 Score) const
