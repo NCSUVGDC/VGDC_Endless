@@ -16,59 +16,53 @@ class VGDC_VR_API AScoreKeeping : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AScoreKeeping();
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	virtual void BeginDestroy() override;
 
-	// Returns an array of FStrings representing players and their high scores
+	// Loads the given file's list of scores into this leaderboard
 	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
-	void GetHighScores(FString filename, TArray<UScoreContainer*>& highScores);
+		void LoadLeaderboard(FString inFilename = "");
 
 	// Adds a new high score to the leaderboard
-	// TODO: This should take a name and integer for parameters and create a new entry from those...
+	// @return Whether or not this value was a new high score (or if it was just discarded!)
 	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
-		void AddHighScore(UScoreContainer* newEntry);
+		bool AddHighScore(FString Name, int32 Score);
 
-	// Adds Leaderboard to file
-	// TODO: Also writes file immediately - something AddHighScore does not do. Such functionality should be moved to a separate function
-	//UFUNCTION(BlueprintCallable, Category = "Score Keeping")
-	//void AddHighScores(TArray<UScoreContainer*> newEntries);
+	// Adds a new high score to the leaderboard
+	// @return Whether or not this value was a new high score (or if it was just discarded!)
+	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
+		bool AddHighScoreContainer(UScoreContainer* NewEntry);
 
 	// Saves leaderboard to file, overwriting old file by default
 	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
-		void SaveLeaderboard(FString fileName);
+		void SaveLeaderboard(FString inFilename = "");
 
-	// Test function to write to a file
+	// Sorts descending
 	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
-	void TestWrite(FString fileName, UScoreContainer* whatToWrite);
+		void Sort();
 
-	// Creates a ScoreContainer UObject representing the player's name and score
-	// Moved to ScoreContainer class
-	//UFUNCTION(BlueprintPure, Category = "Score Keeping")
-	//UScoreContainer* CreateLeaderboardEntry(FString _name, int32 _score);
+	// Checks if the given score is greater than the score at place HighScoreCount
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Score Keeping")
+		bool IsNewHighScore(int32 Score) const;
 
-	// Checks if file exists
-	// TODO: Don't see this used anywhere. Do we still need this?
-	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
-	bool bFileExists(FString filename);
+	// Top N scores are considered high scores
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Score Keeping",
+		META = (ClampMin = 1, ClampMax = 100, UIMax = 50))
+		int HighScoreCount = 10;
 
-	// Checks if there is a new high score
-	UFUNCTION(BlueprintCallable, Category = "Score Keeping")
-	bool isNewHighScore(int32 _score);
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	// Should this score keeper automatically save when destroyed?
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Score Keeping")
+		bool Autosave = true;
 
-public:	
-	// Maximum leaderboard entries
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Score Keeping")
-	int leaderboardMax = 5;
+	// Name of file to autosave to
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Score Keeping")
+		FString Filename = "leaderboards";
 
-	// Contains Players' Name and Score
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Score Keeping")
-	TArray<UScoreContainer*> leaderboard;
+	// Sorted array of scores
+	// Read-Only b/c you should use the AddEntry method
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Score Keeping")
+		TArray<UScoreContainer*> Leaderboard;
 	
 
 	

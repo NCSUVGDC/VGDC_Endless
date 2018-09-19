@@ -5,180 +5,125 @@
 #include "Misc/FileHelper.h"
 #include "HAL/FileManager.h"
 #include "HAL/PlatformFilemanager.h"
+#include <functional> // For Sorting
 
 
 // Sets default values
 AScoreKeeping::AScoreKeeping()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
+}
 
+void AScoreKeeping::BeginDestroy()
+{
+	Super::BeginDestroy();
+
+	if (Autosave)
+	{
+		if (Leaderboard.Num() <= 0)
+		{
+			UE_LOG(LogTemp, Log, TEXT("NOT autosaving leaderboard (zero entries!)"));
+			return;
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("Autosaving leaderboard!"));
+		SaveLeaderboard();
+	}
 }
 
 // Returns an array of FStrings representing players and their high scores
-void AScoreKeeping::GetHighScores(FString filename, TArray<UScoreContainer*>& highScores)
+void AScoreKeeping::LoadLeaderboard(FString inFilename)
 {
-	FString savedDir = FPaths::GameSavedDir();
+	// Default to actor filename if none specified
+	if (inFilename.IsEmpty())
+		inFilename = Filename;
 
-	FString pathToFile = savedDir + "/" + filename + ".csv";
+	FString PathToFile = FPaths::ProjectSavedDir() + "/" + inFilename + ".csv";
 
-	FString leaderboardEntries;
-	TArray<FString>namesAndScores;
-	if (FPaths::FileExists(pathToFile))
+	if (FPaths::FileExists(PathToFile))
 	{
+		FString RawText;
+		TArray<FString> CSVEntries;
+
 		//Get all highscores on file 
-		FFileHelper::LoadFileToString(leaderboardEntries, *pathToFile);
-		leaderboardEntries.ParseIntoArray(namesAndScores, TEXT("\n"));
+		FFileHelper::LoadFileToString(RawText, *PathToFile);
+		RawText.ParseIntoArray(CSVEntries, TEXT("\n"));
 
-		UE_LOG(LogTemp, Display, TEXT("The leaderboard entries are: %s"), *leaderboardEntries);
+		UE_LOG(LogTemp, Log, TEXT("Loading %d entries from file %s..."), CSVEntries.Num(), *PathToFile);
 		
-
 		// And then add them to the TMap
-		for (int32 i = 0; i < namesAndScores.Num(); i++)
+		for (FString CSVEntry : CSVEntries)
 		{
-			FString currentLine = namesAndScores[i];
-			// Find comma location
-			int32 commaIndex = currentLine.Find(","); 
-			// Parse Player name and highscore from string
-			FString playerName = currentLine.Left(commaIndex);
-			int32 playerScore = FCString::Atoi(*currentLine.Right(commaIndex));
-			// Make an leaderboard entry object
-			UScoreContainer* entry = UScoreContainer::CreateScoreContainer(playerName, playerScore);
+			TArray<FString> EntryValues;
+			CSVEntry.ParseIntoArray(EntryValues, TEXT(","));
 
-			highScores.Add(entry);
+			// Parse Player name and highscore from string
+			FString PlayerName = EntryValues[0];
+			int32 PlayerScore = FCString::Atoi(*EntryValues[1]);
+			
+			AddHighScore(PlayerName, PlayerScore);
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to open leaderboard file: %s"), *filename);
+		UE_LOG(LogTemp, Warning, TEXT("Failed to open leaderboard file: %s"), *PathToFile);
 	}
 
 }
 
-// Adds a new high score to the leaderboard
-void AScoreKeeping::AddHighScore(UScoreContainer* newEntry)
+bool AScoreKeeping::AddHighScore(FString Name, int32 Score)
 {
-	// Retrieve all the current high scores
-	// TODO: Should we be re-loading each time? Seems kinda overkill.
-	//GetHighScores(filename, leaderboard);
-	
-	UE_LOG(LogTemp, Log, TEXT("Adding new high score: %s"), *newEntry->ToString());
-
-	// Add new leaderboard entry to list of high scores
-	leaderboard.Add(newEntry);
-	
-	// Sorts leaderboard entries
-	leaderboard.Sort();
-	
-	// Remove low scores if leaderboard is full
-	// Actually, let's just keep them. Disk space is plentiful, and such data may be useful.
-	/*if (leaderboard.Num() > leaderboardMax)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Board full! Popping lowest high score: %s"), *leaderboard[leaderboardMax - 1]->ToString());
-		leaderboard.RemoveAt(leaderboardMax - 1);
-	}*/
-	
-
-	
+	return AddHighScoreContainer(UScoreContainer::CreateScoreContainer(Name, Score));
 }
 
-/*void AScoreKeeping::AddHighScores(FString fileName, TArray<UScoreContainer*> newEntries)
+bool AScoreKeeping::AddHighScoreContainer(UScoreContainer* NewEntry)
 {
-	for(UScoreContainer* newEntry : newEntries)
-		AddHighScore(fileName, newEntry);
+	bool IsHighScore = IsNewHighScore(NewEntry->score);
 
+	UE_LOG( LogTemp, Log, TEXT("Adding new %s: %s"), 
+		IsHighScore ? TEXT("high score") : TEXT("(not high) score"), 
+		*NewEntry->ToString() );
 
-	// TODO: Here below is auto-writing the file. This should be moved to a separate function.
+	// TODO THIS IS INSANELY INEFFICIENT
+	Leaderboard.Add(NewEntry);
+	Sort();
 	
-	FString fileNameAndPath = FPaths::GameSavedDir() + "/" + fileName + ".csv";
+	return IsHighScore;
+}
 
-	FString leaderboardAsString = "";	
+void AScoreKeeping::SaveLeaderboard(FString inFilename)
+{
+	// Default to actor filename if none specified
+	if (inFilename.IsEmpty())
+		inFilename = Filename;
 
-	// Convert leaderboard entries to string 
-	for (int32 i = leaderboard.Num() - 1; i >= 0; i--)
+	FString FullFilePath = FPaths::ProjectSavedDir() + "/" + inFilename + ".csv";
+
+	FString LeaderboardAsString = "";	
+
+	Sort();
+
+	for (UScoreContainer* Entry : Leaderboard)
 	{
-		UScoreContainer* currentEntry = leaderboard[i];
-
-		leaderboardAsString += currentEntry->ToString() + "\n";
+		LeaderboardAsString += Entry->ToString() + "\n";
 	}
 
-	// If file exists
-	if (FPaths::FileExists(fileNameAndPath))
-		//Clear file
-		FPlatformFileManager::Get().GetPlatformFile().DeleteFile(*fileNameAndPath);
+	FFileHelper::SaveStringToFile(LeaderboardAsString, *FullFilePath);
 
-	// Save concatenated string to file
-	FFileHelper::SaveStringToFile(leaderboardAsString, *fileNameAndPath);
-
-	UE_LOG(LogTemp, Display, TEXT("Saved at %s"), *leaderboardAsString);
-}*/
-
-void AScoreKeeping::SaveLeaderboard(FString fileName)
-{
-	FString fileNameAndPath = FPaths::GameSavedDir() + "/" + fileName + ".csv";
-
-	FString leaderboardAsString = "";	
-
-	// Convert leaderboard entries to string 
-	for (int32 i = leaderboard.Num() - 1; i >= 0; i--)
-	{
-		UScoreContainer* currentEntry = leaderboard[i];
-
-		leaderboardAsString += currentEntry->ToString() + "\n";
-	}
-
-	// Save concatenated string to file
-	FFileHelper::SaveStringToFile(leaderboardAsString, *fileNameAndPath);
-
-	UE_LOG(LogTemp, Log, TEXT("Saved leaderboard to file: %s"), *fileNameAndPath);
-	UE_LOG(LogTemp, Log, TEXT("Leaderboard contents:\n%s"), *leaderboardAsString);
+	UE_LOG(LogTemp, Log, TEXT("Saved leaderboard with %d entries to file: %s"), Leaderboard.Num(), *FullFilePath);
 }
 
-void AScoreKeeping::TestWrite(FString fileName, UScoreContainer* whatToWrite)
+void AScoreKeeping::Sort()
 {
-	FString fileNameAndPath = FPaths::GameSavedDir() + "/" + fileName + ".csv";
-	
-	FFileHelper::SaveStringToFile(whatToWrite->ToString(), *fileNameAndPath);
+	Leaderboard.Sort<std::greater<UScoreContainer>>( std::greater<UScoreContainer>() );
 }
 
-/*UScoreContainer* AScoreKeeping::CreateLeaderboardEntry(FString username, int32 highscore)
+bool AScoreKeeping::IsNewHighScore(int32 Score) const
 {
-	UScoreContainer* newScore = NewObject<UScoreContainer>();
-	newScore->SetNameAndScore(username, highscore);
-	UE_LOG(LogTemp, Log, TEXT("Created new score entry: %s"), *newScore->ToString());
-	return newScore;
-}*/
-
-bool AScoreKeeping::isNewHighScore(int32 _score)
-{
-	// High score by default if leaderboard isn't full
-	if (leaderboard.Num() <= leaderboardMax)
+	if (Leaderboard.Num() < HighScoreCount)
 		return true;
-	else // Check if current score is higher than any of the leaderboard scores
-		for (int i = leaderboard.Num() - 1; i >= 0; i--)
-			if (leaderboard[i]->score < _score)
-				return true;
-	
-	return false;
-}
-
-// Called when the game starts or when spawned
-void AScoreKeeping::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-bool AScoreKeeping::bFileExists(FString filename)
-{
-	return FPaths::FileExists(filename);
-}
-
-// Called every frame
-void AScoreKeeping::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
+	else
+		return Score > Leaderboard[HighScoreCount - 1]->score;
 }
 
 
