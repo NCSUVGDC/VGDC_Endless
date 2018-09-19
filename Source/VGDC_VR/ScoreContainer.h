@@ -17,17 +17,25 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Score Container")
 		static UScoreContainer* CreateScoreContainer(FString Name, int32 Score);
 
-	// Sets the score and name for the ScoreContainer object
+	UFUNCTION( BlueprintPure, Category = "Score Container", META = (AdvancedDisplay="0") )
+		static UScoreContainer* CreateRandomScoreContainer(
+			int32 NameMinLength = 3, int32 NameMaxLength = 3, 
+			int32 ScoreMin = 1000, int32 ScoreMax = 9999999);
+
+	// Changes the character of the name at the given index
 	UFUNCTION(BlueprintCallable, Category = "Score Container")
-	void SetNameAndScore(FString _name, int32 _score);
+		void SetNameCharacter(int Index, FString Character);
+
 	// Turns class into a string
 	UFUNCTION(BlueprintPure, Category = "Score Container")
-	FString ToString();
+		FString ToString();
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Score Container")
+		FString name = "Bob";
 
-public:
-	FString name = "Bob";
-	int32 score = 500;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Score Container", META = (ClampMin = 0, UIMin = 0, UIMax = 99999))
+		int32 score = 500;
+
 	FORCEINLINE bool operator>(const UScoreContainer& container) const
 	{
 		if (score == container.score)
@@ -46,7 +54,7 @@ public:
 
 	FORCEINLINE bool operator==(const UScoreContainer & container) const
 	{
-		return score == container.score && name == container.name;
+		return score == container.score && name.Equals(container.name);
 	}
 
 

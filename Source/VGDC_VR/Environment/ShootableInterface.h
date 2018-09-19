@@ -24,7 +24,7 @@ public:
 	/**
 	 * Called by the player when this object is shot
 	 * 
-	 * @return Just a placeholder so this works right in blueprints
+	 * @return Whether the hit counted (i.e. object wasn't dead/disabled)
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Shootable")
 		bool OnShot();
