@@ -14,5 +14,6 @@ None
 * Alberto Carrillo
 * Jackson Bostian
 * Meghan Tankersley
+* Griffin Geiger
 * Dominick Bagnoli
 * Jimmy Zheng
